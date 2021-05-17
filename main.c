@@ -1,8 +1,11 @@
 #include <stdio.h>
 
-#include "input.h"
+#include "macros.h"
+#include "command.h"
 
 int main() {
-    hello();
+    char * line = readLine();
+    printf("%s", line);
+    free(line);
     return 0;
 }

@@ -4,13 +4,21 @@
 #include "macros.h"
 #include "command.h"
 
-Command * readCommand() {
-    char * token;
-    Command command;
+char * readLine() {
+    int len = 1;
+    char c;
+    char * line = MALLOC(len, char);
 
-    while((token = strtok(stdin, WHITESPACE))) {
-
+    while((c = getchar()) != NEW_LINE) {
+        line = REALLOC(line, len, char);
+        line[len++ - 1] = c;
     }
+    
+    line[len - 1] = NULL_CHARACTER;
 
-    free(token);
+    return line;
+}
+
+Command * readCommand() {
+    return NULL;
 }
