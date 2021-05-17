@@ -1,5 +1,9 @@
+#include "stack.h"
+
 typedef struct {
-    char * tokens;
+    Node * tokens;
 } Command;
 
-char * readLine();
+Command * readCommand();
+char * nextToken(Command * command);
+void destroyCommand(Command * command);
