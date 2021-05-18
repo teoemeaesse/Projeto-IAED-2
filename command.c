@@ -9,7 +9,7 @@ Command * newCommand() {
     Command * command;
 
     command = SMALLOC(Command);
-    command->tokens = NULL;
+    command->tokens = createList();
     
     return command;
 }
@@ -36,7 +36,7 @@ char * readLine() {
 }
 
 Command * readCommand() {
-    Command * command = newCommand();
+    Command * command;
     char * raw, * token;
 
     raw = readLine();
@@ -44,8 +44,9 @@ Command * readCommand() {
         return NULL;
     token = strtok(raw, WHITESPACE_STR);
 
+    command = newCommand();
     while(token != NULL) {
-        command->tokens = push(command->tokens, token);
+        insert(command->tokens, token);
         token = strtok(NULL, WHITESPACE_STR);
     }
 
@@ -56,7 +57,7 @@ Command * readCommand() {
 }
 
 char * nextToken(Command * command) {
-    char * token;
+    char * token, * tmp;
 
     if(command == NULL) {
         token = SMALLOC(char);
@@ -64,16 +65,19 @@ char * nextToken(Command * command) {
         return token; 
     }
 
-    token = MALLOC(strlen(command->tokens->str) + ONE, char);
-    strcpy(token, command->tokens->str);
-    popFirst(command->tokens);
+    tmp = getFirst(command->tokens);
+    token = MALLOC(strlen(tmp) + ONE, char);
+    strcpy(token, tmp);
+    removeFirst(command->tokens);
 
     return token;
 }
 
 void destroyCommand(Command * command) {
-    while(command->tokens != NULL)
-        command->tokens = pop(command->tokens);
-    
+    if(command == NULL)
+        return;
+
+    destroyList(command->tokens);
+
     free(command);
 }

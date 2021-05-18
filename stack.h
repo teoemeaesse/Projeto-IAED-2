@@ -1,8 +1,13 @@
-typedef struct node {
-    struct node * next;
+typedef struct node_stack {
+    struct node_stack * next;
     char * str;
-} Node;
+} NodeStack;
 
-Node * push(Node * head, char * str);
-Node * pop(Node * head);
-Node * popFirst(Node * head);
+typedef struct {
+    NodeStack * head;
+} Stack; 
+
+Stack * createStack();
+void push(Stack * stack, char * str);
+char * pop(Stack * stack);
+void destroyStack(Stack * stack);

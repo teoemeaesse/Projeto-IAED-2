@@ -25,9 +25,12 @@ int parseInput() {
     
     if(strcmp(token, HELP_CMD) == ZERO)
         help();
-    if(strcmp(token, QUIT_CMD) == ZERO)
+    if(strcmp(token, QUIT_CMD) == ZERO) {
+        destroyCommand(command);
+        free(token);
         return ZERO;
-    
+    }
+
     free(token);
     destroyCommand(command);
 

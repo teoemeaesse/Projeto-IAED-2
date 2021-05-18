@@ -1,7 +1,7 @@
-#include "stack.h"
+#include "list.h"
 
 typedef struct {
-    Node * tokens;
+    List * tokens;
 } Command;
 
 Command * readCommand();

@@ -4,8 +4,16 @@
 #include "macros.h"
 #include "stack.h"
 
-Node * newNode(char * str) {
-    Node * node = SMALLOC(Node);
+Stack * createStack() {
+    Stack * stack = SMALLOC(Stack);
+
+    stack->head = NULL;
+
+    return stack;
+}
+
+NodeStack * newNodeStack(char * str) {
+    NodeStack * node = SMALLOC(NodeStack);
 
     node->str = MALLOC(strlen(str) + ONE, char);
     strcpy(node->str, str);
@@ -14,52 +22,43 @@ Node * newNode(char * str) {
     return node;
 }
 
-void destroyNode(Node * node) {
-    free(node->str);
-    free(node);
-}
+void push(Stack * stack, char * str) {
+    NodeStack * next = newNodeStack(str);
 
-Node * push(Node * head, char * str) {
-    Node * node = head;
-
-    if(head == NULL)
-        return newNode(str);
-    
-    while(node->next != NULL)
-        node = node->next;
-    node->next = newNode(str);
-
-    return(head);
-}
-
-Node * pop(Node * head) {
-    Node * node = head;
-
-    if(head == NULL || head->next == NULL)
-        return NULL;
-
-    while(node->next->next != NULL)
-        node = node->next;
-    
-    destroyNode(node->next);
-    node->next = NULL;
-
-    return head;
-}
-
-Node * popFirst(Node * head) {
-    Node * new_head;
-
-    if(head == NULL)
-        return NULL;
-    if(head->next == NULL) {
-        destroyNode(head);
-        return NULL;
+    if(stack->head == NULL) {
+        stack->head = next;
+        return;
     }
 
-    new_head = head->next;
-    
-    destroyNode(head);
+    next->next = stack->head;
+    stack->head = next;
+}
 
-    return new_head;
+char * pop(Stack * stack) {
+    NodeStack * old_head = stack->head;
+    char * str;
+
+    if(stack->head == NULL)
+        return NULL;
+    
+    str = stack->head->str;
+    stack->head = stack->head->next;
+
+    free(old_head);
+
+    return str;
+}
+
+void destroyStack(Stack * stack) {
+    char * str;
+
+    if(stack == NULL)
+        return;
+
+    while(stack->head != NULL) {
+        str = pop(stack);
+        free(str);
+    }
+
+    free(stack);
 }
