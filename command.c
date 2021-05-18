@@ -59,7 +59,7 @@ Command * readCommand() {
 char * nextToken(Command * command) {
     char * token, * tmp;
 
-    if(command == NULL) {
+    if(command == NULL || command->tokens->head == NULL) {
         token = SMALLOC(char);
         * token = NULL_CHARACTER;
         return token; 
