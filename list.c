@@ -20,7 +20,7 @@ NodeList * newNodeList(char * str) {
         return NULL;
 
     node = SMALLOC(NodeList);
-    node->str = MALLOC(strlen(str) + ONE, char);
+    node->str = MALLOC_STR(str);
     strcpy(node->str, str);
     node->next = NULL;
 

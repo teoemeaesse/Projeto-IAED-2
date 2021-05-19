@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #define MALLOC(S, T) malloc(S * sizeof(T))
+#define MALLOC_STR(S) malloc((strlen(S) + 1) * sizeof(char))
 #define SMALLOC(T) MALLOC(1, T)
 #define REALLOC(P, S, T) realloc(P, S * sizeof(T))
 

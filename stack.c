@@ -15,7 +15,7 @@ Stack * createStack() {
 NodeStack * newNodeStack(char * str) {
     NodeStack * node = SMALLOC(NodeStack);
 
-    node->str = MALLOC(strlen(str) + ONE, char);
+    node->str = MALLOC_STR(str);
     strcpy(node->str, str);
     node->next = NULL;
 

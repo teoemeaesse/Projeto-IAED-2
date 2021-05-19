@@ -17,7 +17,7 @@ Command * newCommand() {
 char * readLine() {
     int len = ZERO;
     char c;
-    char * line = MALLOC(len, char);
+    char * line = NULL;
 
     while((c = getchar()) != NEW_LINE) {
         line = REALLOC(line, len + ONE, char);
@@ -66,7 +66,7 @@ char * nextToken(Command * command) {
     }
 
     tmp = getFirst(command->tokens);
-    token = MALLOC(strlen(tmp) + ONE, char);
+    token = MALLOC_STR(tmp);
     strcpy(token, tmp);
     removeFirst(command->tokens);
 
