@@ -4,6 +4,10 @@
 #include "macros.h"
 #include "avltree.h"
 
+int max(int n1, int n2) {
+    return n1 > n2 ? n1 : n2;
+}
+
 ValueAVL * createValueStr(char * str) {
     ValueAVL * value = SMALLOC(ValueAVL);   
 
@@ -27,7 +31,20 @@ ValueAVL * createValueInt(int integer) {
     return value;
 }
 
-void destroyValue(ValueAVL * value) {
+ValueAVL * copyValueAVL(ValueAVL * value) {
+    if(value == NULL)
+        return NULL;
+
+    if(value->type == INT)
+        return createValueInt(value->value->integer);
+    
+    if(value->type == STR)
+        return createValueStr(value->value->str);
+    
+    return NULL;
+}
+
+void destroyValueAVL(ValueAVL * value) {
     if(value == NULL || value->value == NULL)
         return;
     
@@ -49,8 +66,22 @@ NodeAVL * createNodeAVL(ValueAVL * value) {
 }
 
 void destroyNodeAVL(NodeAVL * node) {
-    destroyValue(node->value);
+    destroyValueAVL(node->value);
     free(node);
+}
+
+int heightAVL(NodeAVL * node) {
+    if(node == NULL)
+        return -ONE;
+    
+    return ONE + max(heightAVL(node->left), heightAVL(node->right));
+}
+
+int balanceFactorAVL(NodeAVL * node) {
+    if(node == NULL)
+        return ZERO;
+    
+    return heightAVL(node->left) - heightAVL(node->right);
 }
 
 TreeAVL * createTree() {
@@ -61,7 +92,10 @@ TreeAVL * createTree() {
     return tree;
 }
 
-void destroyTree(TreeAVL * tree);
+void destroyTree(TreeAVL * tree) {
+    while(tree->root != NULL)
+        removeTree(tree, tree->root->value);
+}
 
 typedef enum Cmp {HIGHER, LOWER, ERROR} Cmp;
 int compareNodeAVL(NodeAVL * node1, NodeAVL * node2) {
@@ -104,12 +138,14 @@ void insertTreeAux(NodeAVL * root, NodeAVL * node) {
     }
 }
 
-void insertTree(TreeAVL * tree, ValueAVL * value) {
+void insertTree(TreeAVL * tree, ValueAVL * original) {
+    ValueAVL * value;
     NodeAVL * node;
 
-    if(tree == NULL || value == NULL)
+    if(tree == NULL || original == NULL)
         return;
     
+    value = copyValueAVL(original);
     node = createNodeAVL(value);
 
     if(tree->root == NULL) {
@@ -142,72 +178,6 @@ NodeAVL * getSingleChild(NodeAVL * node) {
     
     return NULL;
 }
-
-ValueAVL * copyValueAVL(ValueAVL * value) {
-    if(value == NULL)
-        return NULL;
-
-    if(value->type == INT)
-        return createValueInt(value->value->integer);
-    
-    if(value->type == STR)
-        return createValueStr(value->value->str);
-    
-    return NULL;
-}
-
-/*void removeTreeAux(NodeAVL * node, ValueAVL * value) {
-    NodeAVL * tmp;
-    int children;
-
-    if(node == NULL)
-        return;
-
-    if(node->left != NULL && node->left->value == value) {
-        children = childCount(node->left);
-
-        if(children == ZERO) {
-            destroyNodeAVL(node->left);
-            node->left = NULL;
-        }        
-        else if(children == ONE) {
-            tmp = node->left;
-            node->left = getSingleChild(node->left);
-            destroyNodeAVL(tmp);
-        }
-        else if(children == TWO) {
-            tmp = maxNode(node->left->left);
-            destroyValue(node->left->value);
-            node->left->value = copyValueAVL(tmp->value);
-            removeTreeAux(node->left, tmp->value);
-        }
-    }
-    else if(node->right != NULL && node->right->value == value) {
-        children = childCount(node->right);
-
-        if(children == ZERO) {
-            destroyNodeAVL(node->right);
-            node->right = NULL;
-        }        
-        else if(children == ONE) {
-            tmp = node->right;
-            node->right = getSingleChild(node->right);
-            destroyNodeAVL(tmp);
-        }
-        else if(children == TWO) {
-            tmp = maxNode(node->right->right);
-            destroyValue(node->right->value);
-            node->right->value = copyValueAVL(tmp->value);
-            removeTreeAux(node->right, tmp->value);
-        }
-    }
-    else {
-        if(node->left != NULL)
-            removeTreeAux(node->left, value);
-        if(node->right != NULL)
-            removeTreeAux(node->left, value);
-    }
-}*/
 
 void removeTreeAux(NodeAVL * parent, NodeAVL * node, ValueAVL * value) {
     NodeAVL * tmp;
@@ -242,7 +212,7 @@ void removeTreeAux(NodeAVL * parent, NodeAVL * node, ValueAVL * value) {
             return;
         
         case ONE:
-            tmp = getSingleChild(node);\
+            tmp = getSingleChild(node);
 
             /* update parent node */
             if(parent->left == node)
@@ -258,7 +228,7 @@ void removeTreeAux(NodeAVL * parent, NodeAVL * node, ValueAVL * value) {
             tmp = maxNode(node->left);
 
             /* copy rightmost value in left branch to current node */
-            destroyValue(node->value);
+            destroyValueAVL(node->value);
             node->value = copyValueAVL(tmp->value);
 
             /* recursively remove rightmost node and return */
@@ -296,7 +266,7 @@ void removeTree(TreeAVL * tree, ValueAVL * value) {
                 tmp = maxNode(tree->root->left);
 
                 /* copy rightmost value in left branch to root */
-                destroyValue(tree->root->value);
+                destroyValueAVL(tree->root->value);
                 tree->root->value = copyValueAVL(tmp->value);
 
                 /* recursively remove rightmost node and return */
@@ -320,4 +290,12 @@ NodeAVL * minNode(NodeAVL * node) {
         return node;
 
     return minNode(node->left);
+}
+
+void printTree(NodeAVL * root) {
+    if(root == NULL)
+        return;
+    
+    printTree(root->left);
+    printTree(root->right);
 }

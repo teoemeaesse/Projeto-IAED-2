@@ -21,9 +21,12 @@ typedef struct {
 
 ValueAVL * createValueStr(char * str);
 ValueAVL * createValueInt(int integer);
+void destroyValueAVL(ValueAVL * value);
+int balanceFactorAVL(NodeAVL * node);
 TreeAVL * createTree();
 void destroyTree(TreeAVL * tree);
 void insertTree(TreeAVL * tree, ValueAVL * value);
 void removeTree(TreeAVL * tree, ValueAVL * value);
 NodeAVL * maxNode(NodeAVL * node);
 NodeAVL * minNode(NodeAVL * node);
+void printTree(NodeAVL * root);
