@@ -121,21 +121,53 @@ int isEqualValueAVL(ValueAVL * value1, ValueAVL * value2) {
     return ERROR;
 }
 
-void insertTreeAux(NodeAVL * root, NodeAVL * node) {
+NodeAVL * rotateLeftAVL(NodeAVL * pivot) {
+    NodeAVL * new = pivot->right;
+    pivot->right = new->left;
+    new->left = pivot;
+
+    return new;
+}
+
+NodeAVL * rotateRightAVL(NodeAVL * pivot) {
+    NodeAVL * new = pivot->left;
+    pivot->left = new->right;
+    new->right = pivot;
+
+    return new;
+}
+
+NodeAVL * insertTreeAux(NodeAVL * root, NodeAVL * node) {
+    int balance;
+
+    if(root == NULL)
+        return node;
+
     switch (compareNodeAVL(node, root)) {
-        case HIGHER:
-            if(root->right == NULL)
-                root->right = node;
-            else
-                insertTreeAux(root->right, node);
-            break;
         case LOWER:
-            if(root->left == NULL)
-                root->left = node;
-            else
-                insertTreeAux(root->left, node);
+            root->left = insertTreeAux(root->left, node);
+            break;
+        case HIGHER:
+            root->right = insertTreeAux(root->right, node);
             break;
     }
+
+    balance = balanceFactorAVL(root);
+
+    if(balance > ONE) {
+        if(compareNodeAVL(node, root->left) == HIGHER)
+            root->left = rotateLeftAVL(root->left);
+        
+        return rotateRightAVL(root);
+    }
+    else if(balance < -ONE) {
+        if(compareNodeAVL(node, root->right) == LOWER)
+            root->right = rotateRightAVL(root->right);
+        
+        return rotateLeftAVL(root);
+    }
+
+    return root;
 }
 
 void insertTree(TreeAVL * tree, ValueAVL * original) {
@@ -153,7 +185,7 @@ void insertTree(TreeAVL * tree, ValueAVL * original) {
         return;
     }
 
-    insertTreeAux(tree->root, node);
+    tree->root = insertTreeAux(tree->root, node);
 }
 
 int getChildCount(NodeAVL * node) {
@@ -297,5 +329,6 @@ void printTree(NodeAVL * root) {
         return;
     
     printTree(root->left);
+    printf("[h: %d; val: %d]\n", balanceFactorAVL(root), root->value->value->integer);
     printTree(root->right);
 }

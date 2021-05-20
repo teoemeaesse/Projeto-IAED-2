@@ -1,4 +1,4 @@
 CFLAGS = -g -Wall -Wextra -Werror -ansi -pedantic
 
-proj: *.c *.h
-	gcc $(CFLAGS) -o proj *.c
+proj: src/*.c src/*.h
+	gcc $(CFLAGS) -o proj src/*.c 
