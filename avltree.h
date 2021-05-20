@@ -24,3 +24,6 @@ ValueAVL * createValueInt(int integer);
 TreeAVL * createTree();
 void destroyTree(TreeAVL * tree);
 void insertTree(TreeAVL * tree, ValueAVL * value);
+void removeTree(TreeAVL * tree, ValueAVL * value);
+NodeAVL * maxNode(NodeAVL * node);
+NodeAVL * minNode(NodeAVL * node);

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #define MALLOC(S, T) malloc(S * sizeof(T))
 #define MALLOC_STR(S) malloc((strlen(S) + 1) * sizeof(char))
@@ -15,6 +16,7 @@
 #define MAX_INPUT 65535
 #define ZERO 0
 #define ONE 1
+#define TWO 2
 
 #define HELP_CMD "help"
 #define QUIT_CMD "quit"
