@@ -19,14 +19,14 @@ typedef struct {
     NodeAVL * root;
 } TreeAVL;
 
-ValueAVL * createValueStr(char * str);
-ValueAVL * createValueInt(int integer);
+ValueAVL * createValueStrAVL(char * str);
+ValueAVL * createValueIntAVL(int integer);
 void destroyValueAVL(ValueAVL * value);
 int balanceFactorAVL(NodeAVL * node);
-TreeAVL * createTree();
-void destroyTree(TreeAVL * tree);
-void insertTree(TreeAVL * tree, ValueAVL * value);
-void removeTree(TreeAVL * tree, ValueAVL * value);
-NodeAVL * maxNode(NodeAVL * node);
-NodeAVL * minNode(NodeAVL * node);
-void printTree(NodeAVL * root);
+TreeAVL * createTreeAVL();
+void destroyTreeAVL(TreeAVL * tree);
+void insertTreeAVL(TreeAVL * tree, ValueAVL * value);
+void removeTreeAVL(TreeAVL * tree, ValueAVL * value);
+NodeAVL * maxNodeAVL(NodeAVL * node);
+NodeAVL * minNodeAVL(NodeAVL * node);
+void printTreeAVL(NodeAVL * root);

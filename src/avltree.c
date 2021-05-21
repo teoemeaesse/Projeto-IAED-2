@@ -4,11 +4,11 @@
 #include "macros.h"
 #include "avltree.h"
 
-int max(int n1, int n2) {
+int maxAVL(int n1, int n2) {
     return n1 > n2 ? n1 : n2;
 }
 
-ValueAVL * createValueStr(char * str) {
+ValueAVL * createValueStrAVL(char * str) {
     ValueAVL * value = SMALLOC(ValueAVL);   
 
     value->type = STR;
@@ -20,7 +20,7 @@ ValueAVL * createValueStr(char * str) {
     return value;
 }
 
-ValueAVL * createValueInt(int integer) {
+ValueAVL * createValueIntAVL(int integer) {
     ValueAVL * value = SMALLOC(ValueAVL);   
 
     value->type = INT;
@@ -36,10 +36,10 @@ ValueAVL * copyValueAVL(ValueAVL * value) {
         return NULL;
 
     if(value->type == INT)
-        return createValueInt(value->value->integer);
+        return createValueIntAVL(value->value->integer);
     
     if(value->type == STR)
-        return createValueStr(value->value->str);
+        return createValueStrAVL(value->value->str);
     
     return NULL;
 }
@@ -74,7 +74,7 @@ int heightAVL(NodeAVL * node) {
     if(node == NULL)
         return -ONE;
     
-    return ONE + max(heightAVL(node->left), heightAVL(node->right));
+    return ONE + maxAVL(heightAVL(node->left), heightAVL(node->right));
 }
 
 int balanceFactorAVL(NodeAVL * node) {
@@ -84,7 +84,7 @@ int balanceFactorAVL(NodeAVL * node) {
     return heightAVL(node->left) - heightAVL(node->right);
 }
 
-TreeAVL * createTree() {
+TreeAVL * createTreeAVL() {
     TreeAVL * tree = SMALLOC(TreeAVL);
 
     tree->root = NULL;
@@ -92,32 +92,30 @@ TreeAVL * createTree() {
     return tree;
 }
 
-void destroyTree(TreeAVL * tree) {
+void destroyTreeAVL(TreeAVL * tree) {
     while(tree->root != NULL)
-        removeTree(tree, tree->root->value);
+        removeTreeAVL(tree, tree->root->value);
 }
 
-typedef enum Cmp {HIGHER, LOWER, ERROR} Cmp;
-int compareNodeAVL(NodeAVL * node1, NodeAVL * node2) {
-    if(node1->value->type == INT)
-        return(node1->value->value->integer > node2->value->value->integer ? HIGHER : LOWER);
-    
-    if(node1->value->type == STR) {
-        if(strcmp(node1->value->value->str, node2->value->value->str) > ZERO)
+typedef enum Cmp {HIGHER, LOWER, EQUAL, ERROR} Cmp;
+int compareValueAVL(ValueAVL * value1, ValueAVL * value2) {
+    if(value1->type == INT) {
+        if(value1->value->integer > value2->value->integer)
             return HIGHER;
-        return LOWER;
+        else if(value1->value->integer == value2->value->integer)
+            return EQUAL;
+        else
+            return LOWER;
+    }
+    if(value1->type == STR) {
+        if(strcmp(value1->value->str, value2->value->str) > ZERO)
+            return HIGHER;
+        else if(strcmp(value1->value->str, value2->value->str) == ZERO)
+            return EQUAL;
+        else
+            return LOWER;
     }
 
-    return ERROR;
-}
-
-int isEqualValueAVL(ValueAVL * value1, ValueAVL * value2) {
-    if(value1->type == INT)
-        return value1->value->integer == value2->value->integer;
-
-    if(value1->type == STR)
-        return strcmp(value1->value->str, value2->value->str) == ZERO ? ONE : ZERO;
-    
     return ERROR;
 }
 
@@ -137,31 +135,22 @@ NodeAVL * rotateRightAVL(NodeAVL * pivot) {
     return new;
 }
 
-NodeAVL * insertTreeAux(NodeAVL * root, NodeAVL * node) {
+NodeAVL * balanceRootAVL(NodeAVL * root, ValueAVL * value) {
     int balance;
 
-    if(root == NULL)
-        return node;
-
-    switch (compareNodeAVL(node, root)) {
-        case LOWER:
-            root->left = insertTreeAux(root->left, node);
-            break;
-        case HIGHER:
-            root->right = insertTreeAux(root->right, node);
-            break;
-    }
-
+    if(root == NULL || value == NULL)
+        return NULL;
+    
     balance = balanceFactorAVL(root);
 
     if(balance > ONE) {
-        if(compareNodeAVL(node, root->left) == HIGHER)
+        if(compareValueAVL(value, root->left->value) == HIGHER)
             root->left = rotateLeftAVL(root->left);
         
         return rotateRightAVL(root);
     }
     else if(balance < -ONE) {
-        if(compareNodeAVL(node, root->right) == LOWER)
+        if(compareValueAVL(value, root->right->value) == LOWER)
             root->right = rotateRightAVL(root->right);
         
         return rotateLeftAVL(root);
@@ -170,7 +159,24 @@ NodeAVL * insertTreeAux(NodeAVL * root, NodeAVL * node) {
     return root;
 }
 
-void insertTree(TreeAVL * tree, ValueAVL * original) {
+NodeAVL * insertTreeAuxAVL(NodeAVL * root, NodeAVL * node) {
+    if(root == NULL)
+        return node;
+
+    switch (compareValueAVL(node->value, root->value)) {
+        case EQUAL:
+        case LOWER:
+            root->left = insertTreeAuxAVL(root->left, node);
+            break;
+        case HIGHER:
+            root->right = insertTreeAuxAVL(root->right, node);
+            break;
+    }
+
+    return balanceRootAVL(root, node->value);
+}
+
+void insertTreeAVL(TreeAVL * tree, ValueAVL * original) {
     ValueAVL * value;
     NodeAVL * node;
 
@@ -185,10 +191,10 @@ void insertTree(TreeAVL * tree, ValueAVL * original) {
         return;
     }
 
-    tree->root = insertTreeAux(tree->root, node);
+    tree->root = insertTreeAuxAVL(tree->root, node);
 }
 
-int getChildCount(NodeAVL * node) {
+int getChildCountAVL(NodeAVL * node) {
     if(node->left != NULL && node->right != NULL)
         return TWO;
     
@@ -198,7 +204,7 @@ int getChildCount(NodeAVL * node) {
     return ZERO;
 }
 
-NodeAVL * getSingleChild(NodeAVL * node) {
+NodeAVL * getSingleChildAVL(NodeAVL * node) {
     if(node == NULL)
         return NULL;
     
@@ -211,117 +217,73 @@ NodeAVL * getSingleChild(NodeAVL * node) {
     return NULL;
 }
 
-void removeTreeAux(NodeAVL * parent, NodeAVL * node, ValueAVL * value) {
-    NodeAVL * tmp;
-    int childCount = getChildCount(node);
-
-    /* if node is not what were looking for, recursively check its branches */
-    if(!isEqualValueAVL(node->value, value)) {
-        switch(childCount) {
-            case ZERO:
-                return;
-            case ONE:
-                removeTreeAux(node, getSingleChild(node), value);
-                return;
-            case TWO:
-                removeTreeAux(node, node->left, value);
-                removeTreeAux(node, node->right, value);
-                return;
-        }
-    }
-
-    /* node found, now to remove it */
-    switch(childCount) {
-        case ZERO:
-            /* update parent node */
-            if(parent->left == node)
-                parent->left = NULL;
-            else if(parent->right == node)
-                parent->right = NULL;
-            
-            /* free node and return */
-            destroyNodeAVL(node);
-            return;
-        
-        case ONE:
-            tmp = getSingleChild(node);
-
-            /* update parent node */
-            if(parent->left == node)
-                parent->left = tmp;
-            else if(parent->right == node)
-                parent->right = tmp;
-            
-            /* free node and return */
-            destroyNodeAVL(node);
-            return;
-
-        case TWO:
-            tmp = maxNode(node->left);
-
-            /* copy rightmost value in left branch to current node */
-            destroyValueAVL(node->value);
-            node->value = copyValueAVL(tmp->value);
-
-            /* recursively remove rightmost node and return */
-            removeTreeAux(node, node->left, tmp->value);
-            return;
-    }
-}
-
-void removeTree(TreeAVL * tree, ValueAVL * value) {
+NodeAVL * removeTreeAuxAVL(NodeAVL * node, ValueAVL * value) {
     NodeAVL * tmp;
     int childCount;
 
-    if(tree == NULL || tree->root == NULL || value == NULL)
-        return;
-    
-    /* separate logic for root node, since tree must be updated as well */
-    if(isEqualValueAVL(tree->root->value, value)) {
-        childCount = getChildCount(tree->root);
+    if(node == NULL)
+        return NULL;
 
+    childCount = getChildCountAVL(node);
+
+    if(compareValueAVL(node->value, value) == EQUAL) {
         switch(childCount) {
             case ZERO:
-                /* update tree and return */
-                destroyNodeAVL(tree->root);
-                tree->root = NULL;
-                return;
-            
+                /* free node and return */
+                destroyNodeAVL(node);
+
+                return NULL;
+
             case ONE:
-                /* update tree and return */
-                tmp = getSingleChild(tree->root);
-                destroyNodeAVL(tree->root);
-                tree->root = tmp;
-                return;
-            
+                tmp = getSingleChildAVL(node);
+                
+                /* free node and return child */
+                destroyNodeAVL(node);
+
+                return tmp;
+
             case TWO:
-                tmp = maxNode(tree->root->left);
+                tmp = maxNodeAVL(node->left);
 
-                /* copy rightmost value in left branch to root */
-                destroyValueAVL(tree->root->value);
-                tree->root->value = copyValueAVL(tmp->value);
+                /* copy rightmost value in left branch to current node */
+                destroyValueAVL(node->value);
+                node->value = copyValueAVL(tmp->value);
 
-                /* recursively remove rightmost node and return */
-                removeTreeAux(tree->root, tree->root->left, tmp->value);
-                return;
+                /* recursively remove rightmost node and return updated node */
+                node->left = removeTreeAuxAVL(node->left, tmp->value);
+
+                return node;
         }
     }
 
-    removeTreeAux(NULL, tree->root, value);
+    node = balanceRootAVL(node, value);
+
+    /* if node is not what were looking for, recursively check its branches */
+    node->left = removeTreeAuxAVL(node->left, value);
+    node->right = removeTreeAuxAVL(node->right, value);
+
+    return node;
 }
 
-NodeAVL * maxNode(NodeAVL * node) {
+void removeTreeAVL(TreeAVL * tree, ValueAVL * value) {
+    if(tree == NULL || tree->root == NULL || value == NULL)
+        return;
+
+    tree->root = removeTreeAuxAVL(tree->root, value);
+}
+
+NodeAVL * maxNodeAVL(NodeAVL * node) {
     if(node == NULL || node->right == NULL)
         return node;
 
-    return maxNode(node->right);
+    return maxNodeAVL(node->right);
 }
 
-NodeAVL * minNode(NodeAVL * node) {
+NodeAVL * minNodeAVL(NodeAVL * node) {
     if(node == NULL || node->left == NULL)
         return node;
 
-    return minNode(node->left);
+    return minNodeAVL(node->left);
 }
 
 void printTree(NodeAVL * root) {
