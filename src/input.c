@@ -37,19 +37,21 @@ char * readLine() {
 
 Command * readCommand(int argc) {
     Command * command;
-    char * token;
-    int count = ONE;
+    char * token = NULL;
+    int count = TWO;
 
     command = createCommand();
-    while(token != NULL && ++count < argc) {
-        insert(command->tokens, token);
+
+    while((token != NULL && count++ < argc) || count == TWO) {
         token = strtok(NULL, WHITESPACE_STR);
+        insert(command->tokens, token);
     }
 
     token = strtok(NULL, EMPTY_STR);
-    insert(command->tokens, token);
-
-    free(token);
+    if(token != NULL)
+        insert(command->tokens, token);
+    
+    printf("--%s-%s-%s-%s--", getNth0(command->tokens, 0), getNth0(command->tokens, 1), getNth0(command->tokens, 2), getNth0(command->tokens, 3));
 
     return command;
 }
@@ -57,11 +59,8 @@ Command * readCommand(int argc) {
 char * nextToken(Command * command) {
     char * token, * tmp;
 
-    if(command == NULL || command->tokens->head == NULL) {
-        token = SMALLOC(char);
-        * token = NULL_CHARACTER;
-        return token; 
-    }
+    if(command == NULL || command->tokens->head == NULL)
+        return NULL;
 
     tmp = getFirst(command->tokens);
     token = MALLOC_STR(tmp);

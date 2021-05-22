@@ -4,5 +4,5 @@
 #include "dir.h"
 
 void help();
-int quit(char * raw, char * token);
-void set(DirManager * dirManager, Command * command);
+int quit(char * raw);
+void set(FileSystem * fs, Command * command);

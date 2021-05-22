@@ -13,6 +13,13 @@ List * createList() {
     return list;
 }
 
+int sizeList(List * list) {
+    if(list == NULL)
+        return ZERO;
+    
+    return list->length;
+}
+
 NodeList * newNodeList(char * str) {
     NodeList * node;
 

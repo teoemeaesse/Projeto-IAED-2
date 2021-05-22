@@ -4,6 +4,7 @@ typedef struct {
     List * tokens;
 } Command;
 
-Command * readCommand();
+Command * readCommand(int argc);
+char * readLine();
 char * nextToken(Command * command);
 void destroyCommand(Command * command);

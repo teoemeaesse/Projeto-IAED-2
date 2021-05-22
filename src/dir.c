@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "macros.h"
+#include "list.h"
 #include "dir.h"
 
 int maxAVL(int n1, int n2) {
@@ -20,9 +21,11 @@ NodeAVL * createNodeAVL(char * key, char * value) {
     node->key = MALLOC_STR(key);
     strcpy(node->key, key);
     
-    node->value = createDirManager();
-    node->value->value = MALLOC_STR(value);
-    strcpy(node->value->value, value);
+    node->value = createDirectory();
+    if(value != NULL) {
+        node->value->value = MALLOC_STR(value);
+        strcpy(node->value->value, value);
+    }
 
     node->left = NULL;
     node->right = NULL;
@@ -58,6 +61,9 @@ TreeAVL * createTreeAVL() {
 }
 
 void destroyTreeAVL(TreeAVL * tree) {
+    if(tree == NULL)
+        return;
+
     while(tree->root != NULL)
         removeTreeAVL(tree, tree->root->key);
     
@@ -144,7 +150,7 @@ NodeAVL * insertTreeAuxAVL(NodeAVL * root, NodeAVL * node) {
 void insertTreeAVL(TreeAVL * tree, char * key, char * value) {
     NodeAVL * node;
 
-    if(tree == NULL || key == NULL || value == NULL)
+    if(tree == NULL || key == NULL)
         return;
     
     if(containsKeyAVL(tree, key))
@@ -197,7 +203,7 @@ NodeAVL * removeTreeAuxAVL(NodeAVL * node, char * key, int destructive) {
             case ZERO:
                 /* free node and return */
                 if(destructive == ONE)
-                    destroyDirManager(node->value);
+                    destroyDirectory(node->value);
                 destroyNodeAVL(node);
 
                 return NULL;
@@ -207,7 +213,7 @@ NodeAVL * removeTreeAuxAVL(NodeAVL * node, char * key, int destructive) {
                 
                 /* free node and link parent with child */
                 if(destructive == ONE)
-                    destroyDirManager(node->value);
+                    destroyDirectory(node->value);
                 destroyNodeAVL(node);
 
                 return tmp;
@@ -216,7 +222,7 @@ NodeAVL * removeTreeAuxAVL(NodeAVL * node, char * key, int destructive) {
                 tmp = maxNodeAVL(node->left);
 
                 /* move rightmost node in left branch to current node */
-                destroyDirManager(node->value);
+                destroyDirectory(node->value);
                 node->value = tmp->value;
 
                 /* recursively remove rightmost node and return updated node */
@@ -256,32 +262,35 @@ NodeAVL * minNodeAVL(NodeAVL * node) {
     return minNodeAVL(node->left);
 }
 
-int containsAuxAVL(NodeAVL * node, char * key) {
-    if(node == NULL || key == NULL)
-        return ZERO;
-
-    if(compareKeysAVL(key, node->key) == EQUAL)
-        return ONE;
-    
-    switch(compareKeysAVL(key, node->key)) {
-        case LOWER:
-            if(containsAuxAVL(node->left, key) == ONE)
-                return ONE;
-            break;
-        case HIGHER:
-            if(containsAuxAVL(node->right, key) == ONE)
-                return ONE;
-            break;
-    }
-    
-    return ZERO;
-}
-
 int containsKeyAVL(TreeAVL * tree, char * key) {
     if(tree == NULL || key == NULL)
         return ZERO;
 
-    return containsAuxAVL(tree->root, key);
+    return searchAVL(tree, key) != NULL;
+}
+
+NodeAVL * searchAuxAVL(NodeAVL * node, char * key) {
+    if(node == NULL || key == NULL)
+        return NULL;
+
+    if(compareKeysAVL(key, node->key) == EQUAL)
+        return node;
+    
+    switch(compareKeysAVL(key, node->key)) {
+        case LOWER:
+            return searchAuxAVL(node->left, key);
+        case HIGHER:
+            return searchAuxAVL(node->right, key);
+    }
+    
+    return NULL;
+}
+
+NodeAVL * searchAVL(TreeAVL * tree, char * key) {
+    if(tree == NULL || key == NULL)
+        return NULL;
+
+    return searchAuxAVL(tree->root, key);
 }
 
 void printTree(NodeAVL * root) {
@@ -295,34 +304,116 @@ void printTree(NodeAVL * root) {
 
 /* DIRECTORY FUNCTIONS */
 
-DirManager * createDirManager() {
-    DirManager * dirManager = SMALLOC(DirManager);
+Directory * createDirectory() {
+    Directory * dir = SMALLOC(Directory);
 
-    dirManager->subdirs = NULL;
-    dirManager->history = NULL;
-    dirManager->value = NULL;
+    dir->subdirs = createTreeAVL();
+    dir->history = createStack();
+    dir->value = NULL;
 
-    return dirManager;
+    return dir;
 }
 
-void destroyDirManager(DirManager * dirManager) {
-    if(dirManager == NULL)
+FileSystem * createFileSystem() {
+    FileSystem * fs = SMALLOC(FileSystem);
+
+    fs->root = createDirectory();
+
+    return fs;
+}
+
+void destroyDirectory(Directory * dir) {
+    if(dir == NULL)
         return;
     
-    if(dirManager->subdirs != NULL)
-        destroyTreeAVL(dirManager->subdirs);
+    destroyTreeAVL(dir->subdirs);
+    destroyStack(dir->history);
     
-    if(dirManager->history != NULL)
-        destroyStack(dirManager->history);
-    
-    free(dirManager->value);
-    free(dirManager);
+    free(dir->value);
+    free(dir);
 }
 
-/*int isSubDirectory(TreeAVL * dir, char * sub) {
-    
+void destroyFileSystem(FileSystem * fs) {
+    destroyDirectory(fs->root);
+    free(fs);
 }
 
-void addPath(DirManager * dirManager, char * path, char * value) {
+int isSubDirectory(Directory * dir, char * sub) {
+    if(dir == NULL || dir->subdirs == NULL || sub == NULL)
+        return ZERO;
 
-}*/
+    return containsKeyAVL(dir->subdirs, sub);
+}
+
+int isEmpty(Directory * dir) {
+    if(dir == NULL)
+        return ZERO;
+    
+    return dir->subdirs->root == NULL;
+}
+
+Directory * addDirectoryAux(Directory * dir, List * components, char * value) {
+    NodeAVL * target;
+    char * first;
+    
+    if(dir == NULL)
+        return NULL;
+
+    first = MALLOC_STR(getFirst(components));
+    strcpy(first, getFirst(components));
+
+    if(isSubDirectory(dir, first)) {
+        if(sizeList(components) == ONE) {
+            target = searchAVL(dir->subdirs, first);
+
+            if(target->value->value == NULL)
+                target->value->value = MALLOC_STR(value);
+            
+            strcpy(target->value->value, value);
+        }
+        else {
+            removeFirst(components);
+
+            target = searchAVL(dir->subdirs, first);
+
+            target->value = addDirectoryAux(target->value, components, value);
+        }
+    }
+    else {
+        if(sizeList(components) == ONE)
+            insertTreeAVL(dir->subdirs, first, value);
+        else {
+            removeFirst(components);
+            
+            insertTreeAVL(dir->subdirs, first, NULL);
+            
+            target = searchAVL(dir->subdirs, first);
+            target->value = addDirectoryAux(target->value, components, value);
+        }
+    }
+
+    free(first);
+    
+    return dir;
+}
+
+void addDirectory(FileSystem * fs, char * path, char * value) {
+    List * components;
+    char * token;
+
+    if(fs == NULL || path == NULL || value == NULL)
+        return;
+    
+    components = createList();
+    
+    token = strtok(path, PATH_SEPARATOR_STR);
+    while(token != NULL) {
+        insert(components, token);
+        token = strtok(NULL, PATH_SEPARATOR_STR);
+    }
+
+    if(sizeList(components) != ZERO)
+        fs->root = addDirectoryAux(fs->root, components, value);
+
+    destroyList(components);
+}

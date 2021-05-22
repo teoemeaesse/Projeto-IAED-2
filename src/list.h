@@ -9,6 +9,7 @@ typedef struct {
 } List;
 
 List * createList();
+int sizeList(List * list);
 void insert(List * list, char * str);
 void destroyList(List * list);
 char * getNth0(List * list, int index);

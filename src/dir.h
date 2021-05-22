@@ -1,22 +1,26 @@
 #include "stack.h"
 
-struct dir_manager;
+struct directory;
 
 typedef struct node_avl {
     struct node_avl * left, * right;
     char * key;
-    struct dir_manager * value;
+    struct directory * value;
 } NodeAVL;
 
 typedef struct {
     NodeAVL * root;
 } TreeAVL;
 
-typedef struct dir_manager{
+typedef struct directory{
     TreeAVL * subdirs;
     Stack * history;
     char * value;
-} DirManager;
+} Directory;
+
+typedef struct {
+    Directory * root;
+} FileSystem;
 
 TreeAVL * createTreeAVL();
 void destroyTreeAVL(TreeAVL * tree);
@@ -24,9 +28,13 @@ void insertTreeAVL(TreeAVL * tree, char * key, char * value);
 void removeTreeAVL(TreeAVL * tree, char * key);
 NodeAVL * maxNodeAVL(NodeAVL * node);
 NodeAVL * minNodeAVL(NodeAVL * node);
-int containsKeyAVL(TreeAVL * tree, char * str);
+int containsKeyAVL(TreeAVL * tree, char * key);
+NodeAVL * searchAVL(TreeAVL * tree, char * key);
 void printTree(NodeAVL * root);
 
-DirManager * createDirManager();
-void destroyDirManager(DirManager * dirManager);
-void addPath(DirManager * dirManager, char * path, char * value);
+Directory * createDirectory();
+FileSystem * createFileSystem();
+void destroyDirectory(Directory * dir);
+void destroyFileSystem(FileSystem * fs);
+int isEmpty(Directory * dir);
+void addDirectory(FileSystem * fs, char * path, char * value);
