@@ -6,12 +6,13 @@
 #define SMALLOC(T) MALLOC(1, T)
 #define REALLOC(P, S, T) realloc(P, S * sizeof(T))
 
-#define EMPTY_STR "";
+#define EMPTY_STR ""
 #define WHITESPACE ' '
 #define WHITESPACE_STR " "
 #define NEW_LINE '\n'
 #define TAB '\t'
 #define NULL_CHARACTER '\0'
+#define PATH_SEPARATOR_STR "/"
 
 #define MAX_INPUT 65535
 #define ZERO 0

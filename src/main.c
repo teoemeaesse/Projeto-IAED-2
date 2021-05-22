@@ -2,52 +2,85 @@
 #include <string.h>
 
 #include "macros.h"
-#include "command.h"
-#include "stack.h"
-
+#include "commands.h"
 
 int parseInput();
 
 int main() {
-    Stack * history = createStack();
+    DirManager * root = createDirManager();
+    TreeAVL * tree = createTreeAVL();
+    
+    
 
-    while(parseInput(history) != ZERO);
+    root->subdirs = tree;
+
+    insertTreeAVL(tree, "a", "1");
+    insertTreeAVL(tree, "b", "2");
+    insertTreeAVL(tree, "c", "3");
+    insertTreeAVL(tree, "3", "3");
+    insertTreeAVL(tree, "as", "3");
+    insertTreeAVL(tree, "b", "3");
+    insertTreeAVL(tree, "z", "3");
+    insertTreeAVL(tree, "ss", "3");
+    insertTreeAVL(tree, "2", "3");
+    insertTreeAVL(tree, "6", "3");
+    insertTreeAVL(tree, "7", "3");
+    insertTreeAVL(tree, "8", "3");
+    insertTreeAVL(tree, "9", "3");
+    insertTreeAVL(tree, "99", "3");
+    insertTreeAVL(tree, "asd", "3");
+    insertTreeAVL(tree, "bac", "3");
+    insertTreeAVL(tree, "asdc", "3");
+    insertTreeAVL(tree, "cac", "3");
+    insertTreeAVL(tree, "0", "3");
+    insertTreeAVL(tree, "+", "3");
+    insertTreeAVL(tree, "_", "3");
+    insertTreeAVL(tree, "[", "3");
+    insertTreeAVL(tree, "]", "3");
+    insertTreeAVL(tree, "\\", "3");
+    insertTreeAVL(tree, "|", "3");
+    insertTreeAVL(tree, "^", "3");
+    insertTreeAVL(tree, "&", "3");
+    insertTreeAVL(tree, "*", "3");
+    insertTreeAVL(tree, ")", "3");
+    insertTreeAVL(tree, "(", "3");
+    insertTreeAVL(tree, "@", "3");
+
+    printTree(tree->root);
+
+    destroyDirManager(root);
 
     return ZERO;
-}
-
-void help() {
-    printf("%s", HELP_CMD_TXT);
-}
-
-int quit(Command * command, char * token) {
-    destroyCommand(command);
-    free(token);
     
-    return ZERO;
+    /*DirManager * dirManager = createDirManager();
+
+    while(parseInput(dirManager) != ZERO);
+
+    destroyDirManager(dirManager);
+
+    return ZERO;*/
 }
 
-void set(Command * command, Stack * history) {
-    
-}
 
-
-int parseInput(Stack * history) {
+/*int parseInput(DirManager * dirManager) {
     Command * command;
-    char * token;
-
-    command = readCommand();
-    token = nextToken(command);
+    char * raw, * token;
+    
+    raw = readLine();
+    if(raw == NULL)
+        return NULL;
+    token = strtok(raw, WHITESPACE_STR);
     
     if(strcmp(token, HELP_CMD) == ZERO)
         help();
 
     else if(strcmp(token, QUIT_CMD) == ZERO)
-        return quit(command, token);
+        return quit(raw, token);
 
-    else if(strcmp(token, SET_CMD))
-        set(command, history);
-        
+    else if(strcmp(token, SET_CMD)) {
+        command = readCommand(3);
+        set(dirManager, command);
+    }
     else if(strcmp(token, PRINT_CMD)) {
         
     }
@@ -65,7 +98,8 @@ int parseInput(Stack * history) {
     }
 
     destroyCommand(command);
+    free(raw);
     free(token);
 
     return ONE;
-}
+}*/

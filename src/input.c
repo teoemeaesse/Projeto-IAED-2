@@ -3,9 +3,9 @@
 #include <string.h>
 
 #include "macros.h"
-#include "command.h"
+#include "input.h"
 
-Command * newCommand() {
+Command * createCommand() {
     Command * command;
 
     command = SMALLOC(Command);
@@ -35,22 +35,20 @@ char * readLine() {
     return line;
 }
 
-Command * readCommand() {
+Command * readCommand(int argc) {
     Command * command;
-    char * raw, * token;
+    char * token;
+    int count = ONE;
 
-    raw = readLine();
-    if(raw == NULL)
-        return NULL;
-    token = strtok(raw, WHITESPACE_STR);
-
-    command = newCommand();
-    while(token != NULL) {
+    command = createCommand();
+    while(token != NULL && ++count < argc) {
         insert(command->tokens, token);
         token = strtok(NULL, WHITESPACE_STR);
     }
 
-    free(raw);
+    token = strtok(NULL, EMPTY_STR);
+    insert(command->tokens, token);
+
     free(token);
 
     return command;
