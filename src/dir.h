@@ -1,4 +1,4 @@
-#include "stack.h"
+#include "list.h"
 
 struct directory;
 
@@ -14,7 +14,7 @@ typedef struct {
 
 typedef struct directory{
     TreeAVL * subdirs;
-    Stack * history;
+    List * history;
     char * value;
 } Directory;
 
@@ -30,7 +30,7 @@ NodeAVL * maxNodeAVL(NodeAVL * node);
 NodeAVL * minNodeAVL(NodeAVL * node);
 int containsKeyAVL(TreeAVL * tree, char * key);
 NodeAVL * searchAVL(TreeAVL * tree, char * key);
-void printTree(NodeAVL * root);
+void printTreeAVL(NodeAVL * root, List * path);
 
 Directory * createDirectory();
 FileSystem * createFileSystem();
@@ -38,3 +38,4 @@ void destroyDirectory(Directory * dir);
 void destroyFileSystem(FileSystem * fs);
 int isEmpty(Directory * dir);
 void addDirectory(FileSystem * fs, char * path, char * value);
+void printFileSystem(FileSystem * fs);

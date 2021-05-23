@@ -38,13 +38,11 @@ int parseInput(FileSystem * fs) {
     }
 
     else if(strcmp(token, SET_CMD) == ZERO) {
-        command = readCommand(3);
+        command = readCommand(2);
         set(fs, command);
-
-        printf("key: %s | value: %s", fs->root->subdirs->root->key, fs->root->subdirs->root->value->value);
     }
-    else if(strcmp(token, PRINT_CMD)) {
-        
+    else if(strcmp(token, PRINT_CMD) == ZERO) {
+        print(fs);
     }
     else if(strcmp(token, FIND_CMD)) {
         
@@ -58,6 +56,7 @@ int parseInput(FileSystem * fs) {
     else if(strcmp(token, DELETE_CMD)) {
         
     }
+
 
     if(command != NULL)
         destroyCommand(command);

@@ -6,3 +6,4 @@
 void help();
 int quit(char * raw);
 void set(FileSystem * fs, Command * command);
+void print(FileSystem * fs);

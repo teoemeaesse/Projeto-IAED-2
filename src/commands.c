@@ -32,3 +32,7 @@ void set(FileSystem * fs, Command * command) {
     free(path);
     free(value);
 }
+
+void print(FileSystem * fs) {
+    printFileSystem(fs);
+}

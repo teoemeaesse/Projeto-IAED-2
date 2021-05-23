@@ -99,6 +99,22 @@ char * getFirst(List * list) {
     return getNth0(list, ZERO);
 }
 
+NodeList * searchStack(List * list, char * value) {
+    NodeList * first = list->head;
+
+    if(first == NULL)
+        return NULL;
+    
+    while(first != NULL) {
+        if(strcmp(first->str, value) == ZERO)
+            return first;
+        
+        first = first->next;
+    }
+
+    return NULL;
+}
+
 void removeNth0(List * list, int index) {
     NodeList * node, * previous;
     int count = ZERO;

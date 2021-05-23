@@ -51,8 +51,6 @@ Command * readCommand(int argc) {
     if(token != NULL)
         insert(command->tokens, token);
     
-    printf("--%s-%s-%s-%s--", getNth0(command->tokens, 0), getNth0(command->tokens, 1), getNth0(command->tokens, 2), getNth0(command->tokens, 3));
-
     return command;
 }
 
