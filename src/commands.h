@@ -7,3 +7,5 @@ void help();
 int quit(char * raw);
 void set(FileSystem * fs, Command * command);
 void print(FileSystem * fs);
+void find(FileSystem * fs, Command * command);
+void list(FileSystem * fs, Command * command);

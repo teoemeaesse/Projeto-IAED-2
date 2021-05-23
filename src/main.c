@@ -38,17 +38,19 @@ int parseInput(FileSystem * fs) {
     }
 
     else if(strcmp(token, SET_CMD) == ZERO) {
-        command = readCommand(2);
+        command = readCommand(TWO);
         set(fs, command);
     }
     else if(strcmp(token, PRINT_CMD) == ZERO) {
         print(fs);
     }
-    else if(strcmp(token, FIND_CMD)) {
-        
+    else if(strcmp(token, FIND_CMD) == ZERO) {
+        command = readCommand(ONE);
+        find(fs, command);
     }
-    else if(strcmp(token, LIST_CMD)) {
-        
+    else if(strcmp(token, LIST_CMD) == ZERO) {
+        command = readCommand(ONE);
+        list(fs, command);
     }
     else if(strcmp(token, SEARCH_CMD)) {
         

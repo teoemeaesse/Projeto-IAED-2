@@ -42,9 +42,10 @@ Command * readCommand(int argc) {
 
     command = createCommand();
 
-    while((token != NULL && count++ < argc) || count == TWO) {
+    while((token != NULL && count < argc) || count == TWO) {
         token = strtok(NULL, WHITESPACE_STR);
         insert(command->tokens, token);
+        count++;
     }
 
     token = strtok(NULL, EMPTY_STR);
@@ -52,6 +53,26 @@ Command * readCommand(int argc) {
         insert(command->tokens, token);
     
     return command;
+}
+
+List * pathToList(char * path) {
+    List * components;
+    char * token;
+    
+    if(path == NULL)
+        return NULL;
+
+    components = createList();
+
+    token = strtok(path, PATH_SEPARATOR_STR);
+    while(token != NULL) {
+        insert(components, token);
+        token = strtok(NULL, PATH_SEPARATOR_STR);
+    }
+
+    free(token);
+
+    return components;
 }
 
 char * nextToken(Command * command) {

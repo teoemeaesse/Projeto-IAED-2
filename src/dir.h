@@ -30,7 +30,7 @@ NodeAVL * maxNodeAVL(NodeAVL * node);
 NodeAVL * minNodeAVL(NodeAVL * node);
 int containsKeyAVL(TreeAVL * tree, char * key);
 NodeAVL * searchAVL(TreeAVL * tree, char * key);
-void printTreeAVL(NodeAVL * root, List * path);
+void printTreeAVL(NodeAVL * root);
 
 Directory * createDirectory();
 FileSystem * createFileSystem();
@@ -38,4 +38,5 @@ void destroyDirectory(Directory * dir);
 void destroyFileSystem(FileSystem * fs);
 int isEmpty(Directory * dir);
 void addDirectory(FileSystem * fs, char * path, char * value);
-void printFileSystem(FileSystem * fs);
+void printDirectory(Directory * dir, List * path);
+Directory * findSubDirectory(Directory * dir, List * path);

@@ -2,8 +2,8 @@
 #include <stdio.h>
 
 #include "macros.h"
-#include "list.h"
 #include "dir.h"
+#include "input.h"
 
 int maxAVL(int n1, int n2) {
     return n1 > n2 ? n1 : n2;
@@ -293,20 +293,15 @@ NodeAVL * searchAVL(TreeAVL * tree, char * key) {
     return searchAuxAVL(tree->root, key);
 }
 
-void printTreeAVL(NodeAVL * root, List * path) {
-    int i;
-
+void printTreeAVL(NodeAVL * root) {
     if(root == NULL)
         return;
     
-    insert(path, root->key);
-    printTreeAVL(root->left, path);
-    printTreeAVL(root->right, path);
-    removeNth0(path, sizeList(path) - ONE);
+    printTreeAVL(root->left);
 
-    for(i = ZERO; i < sizeList(path); i++)
-        printf("/%s", getNth0(path, i));
-    printf(" %s\n", root->value->value);
+    printf("%s\n", root->key);
+
+    printTreeAVL(root->right);
 }
 
 /* DIRECTORY FUNCTIONS */
@@ -411,18 +406,11 @@ Directory * addDirectoryAux(Directory * dir, List * components, char * value) {
 
 void addDirectory(FileSystem * fs, char * path, char * value) {
     List * components;
-    char * token;
 
     if(fs == NULL || path == NULL || value == NULL)
         return;
 
-    components = createList();
-    
-    token = strtok(path, PATH_SEPARATOR_STR);
-    while(token != NULL) {
-        insert(components, token);
-        token = strtok(NULL, PATH_SEPARATOR_STR);
-    }
+    components = pathToList(path);
 
     if(sizeList(components) != ZERO)
         fs->root = addDirectoryAux(fs->root, components, value);
@@ -430,7 +418,7 @@ void addDirectory(FileSystem * fs, char * path, char * value) {
     destroyList(components);
 }
 
-void printFileSystemAux(Directory * dir, List * path) {
+void printDirectory(Directory * dir, List * path) {
     NodeAVL * target;
     int i, j, len;
     char * tmp;
@@ -443,7 +431,7 @@ void printFileSystemAux(Directory * dir, List * path) {
         len = sizeList(path);
         
         target = searchAVL(dir->subdirs, tmp);
-        printFileSystemAux(target->value, path);
+        printDirectory(target->value, path);
 
         if(target->value->value != NULL) {
             for(j = ZERO; j < len; j++)
@@ -456,15 +444,20 @@ void printFileSystemAux(Directory * dir, List * path) {
     }
 }
 
-void printFileSystem(FileSystem * fs) {
-    List * path;
-
-    if(fs == NULL || fs->root == NULL)
-        return;
+Directory * findSubDirectory(Directory * dir, List * path) {
+    NodeAVL * target;
     
-    path = createList();
+    target = searchAVL(dir->subdirs, getFirst(path));
 
-    printFileSystemAux(fs->root, path);
+    if(target == NULL) {
+        printf("%s\n", NOT_FOUND_ERR);
+        return NULL;
+    }
 
-    destroyList(path);
+    if(sizeList(path) == ONE)
+        return target->value;
+
+    removeFirst(path);
+
+    return findSubDirectory(target->value, path);
 }

@@ -19,6 +19,9 @@
 #define ONE 1
 #define TWO 2
 
+#define NOT_FOUND_ERR "not found"
+#define NO_DATA_ERR "no data"
+
 #define HELP_CMD "help"
 #define QUIT_CMD "quit"
 #define SET_CMD "set"
