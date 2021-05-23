@@ -115,6 +115,33 @@ NodeList * searchStack(List * list, char * value) {
     return NULL;
 }
 
+void removeValue(List * list, char * value) {
+    NodeList * node, * previous;
+
+    if(list == NULL || list->head == NULL)
+        return;
+
+    node = list->head;
+    if(strcmp(value, list->head->str) == ZERO) {
+        list->head = list->head->next;
+        destroyNodeList(node);
+        list->length--;
+        return;
+    }
+    
+    while(node != NULL) {
+        if(strcmp(value, node->str) == ZERO) {
+            previous->next = node->next;
+            destroyNodeList(node);
+            list->length--;
+            return;
+        }
+
+        previous = node;
+        node = node->next;
+    }
+}
+
 void removeNth0(List * list, int index) {
     NodeList * node, * previous;
     int count = ZERO;

@@ -32,18 +32,14 @@ int parseInput(FileSystem * fs) {
 
     if(strcmp(token, HELP_CMD) == ZERO)
         help();
-
-    else if(strcmp(token, QUIT_CMD) == ZERO) {
+    else if(strcmp(token, QUIT_CMD) == ZERO) 
         return quit(raw);
-    }
-
     else if(strcmp(token, SET_CMD) == ZERO) {
         command = readCommand(TWO);
         set(fs, command);
     }
-    else if(strcmp(token, PRINT_CMD) == ZERO) {
+    else if(strcmp(token, PRINT_CMD) == ZERO)
         print(fs);
-    }
     else if(strcmp(token, FIND_CMD) == ZERO) {
         command = readCommand(ONE);
         find(fs, command);
@@ -52,11 +48,13 @@ int parseInput(FileSystem * fs) {
         command = readCommand(ONE);
         list(fs, command);
     }
-    else if(strcmp(token, SEARCH_CMD)) {
-        
+    else if(strcmp(token, SEARCH_CMD) == ZERO) {
+        command = readCommand(ONE);
+        search(fs, command);
     }
-    else if(strcmp(token, DELETE_CMD)) {
-        
+    else if(strcmp(token, DELETE_CMD) == ZERO) {
+        command = readCommand(ONE);
+        delete(fs, command);
     }
 
 

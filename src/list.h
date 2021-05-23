@@ -18,6 +18,7 @@ void destroyList(List * list);
 char * getNth0(List * list, int index);
 char * getFirst(List * list);
 NodeList * searchList(List * list, char * value);
+void removeValue(List * list, char * value);
 void removeNth0(List * list, int index);
 void removeFirst(List * list);
 

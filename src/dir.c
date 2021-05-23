@@ -293,6 +293,52 @@ NodeAVL * searchAVL(TreeAVL * tree, char * key) {
     return searchAuxAVL(tree->root, key);
 }
 
+int searchDirectoryAux(Directory * dir, List * components, char * value) {
+    NodeAVL * target;
+    char * key;
+    int i;
+
+    if(dir == NULL)
+        return ZERO;
+
+    for(i = ZERO; (key = getNth0(dir->history, i)) != NULL; i++) {
+        target = searchAVL(dir->subdirs, key);
+    
+        insert(components, key);
+
+        /*printf("--%s=%s--", value, target->value->value);*/
+
+        if(target->value->value != NULL && strcmp(value, target->value->value) == ZERO) 
+            return ONE;
+        
+        if(searchDirectoryAux(target->value, components, value) == ONE)
+            return ONE;
+
+        removeNth0(components, sizeList(components) - ONE);
+    }
+
+    return ZERO;
+}
+
+List * searchDirectory(Directory * tree, char * value) {
+    List * components;
+
+    if(tree == NULL || value == NULL)
+        return NULL;
+    
+    components = createList();
+    searchDirectoryAux(tree, components, value);
+
+    if(components)
+
+    if(sizeList(components) == ZERO) {
+        destroyList(components);
+        return NULL;
+    }
+
+    return components;
+}
+
 void printTreeAVL(NodeAVL * root) {
     if(root == NULL)
         return;
@@ -347,6 +393,34 @@ int isSubDirectory(Directory * dir, char * sub) {
     return containsKeyAVL(dir->subdirs, sub);
 }
 
+void destroyPath(FileSystem * fs, List * components) {
+    Directory * parent = fs->root;
+    NodeAVL * tmp;
+
+    if(components == NULL) {
+        destroyDirectory(fs->root);
+        fs->root = createDirectory();
+        return;
+    }
+
+    while(sizeList(components) > ONE) {
+        tmp = searchAVL(parent->subdirs, getFirst(components));
+        if(tmp == NULL) {
+            printf("%s\n", NOT_FOUND_ERR);
+            return;
+        }
+        parent = tmp->value;
+        removeFirst(components);
+    }
+    
+    if(isSubDirectory(parent, getFirst(components))) {
+        removeTreeAVL(parent->subdirs, getFirst(components));
+        removeValue(parent->history, getFirst(components));
+    }
+    else
+        printf("%s\n", NOT_FOUND_ERR);
+}
+
 int isEmpty(Directory * dir) {
     if(dir == NULL)
         return ZERO;
@@ -368,9 +442,10 @@ Directory * addDirectoryAux(Directory * dir, List * components, char * value) {
         if(sizeList(components) == ONE) {
             target = searchAVL(dir->subdirs, first);
 
-            if(target->value->value == NULL) 
-                target->value->value = MALLOC_STR(value);
-
+            if(target->value->value != NULL) 
+                free(target->value->value);
+            
+            target->value->value = MALLOC_STR(value);
             strcpy(target->value->value, value);
         }
         else {
@@ -431,7 +506,6 @@ void printDirectory(Directory * dir, List * path) {
         len = sizeList(path);
         
         target = searchAVL(dir->subdirs, tmp);
-        printDirectory(target->value, path);
 
         if(target->value->value != NULL) {
             for(j = ZERO; j < len; j++)
@@ -439,6 +513,8 @@ void printDirectory(Directory * dir, List * path) {
             printf(" %s", target->value->value);
             putchar('\n');
         }
+
+        printDirectory(target->value, path);
 
         removeNth0(path, len - ONE);
     }

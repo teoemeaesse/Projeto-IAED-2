@@ -38,14 +38,15 @@ char * readLine() {
 Command * readCommand(int argc) {
     Command * command;
     char * token = NULL;
-    int count = TWO;
 
     command = createCommand();
 
-    while((token != NULL && count < argc) || count == TWO) {
+    while(--argc > ZERO) {
         token = strtok(NULL, WHITESPACE_STR);
+        if(token == NULL)
+            return NULL;
+
         insert(command->tokens, token);
-        count++;
     }
 
     token = strtok(NULL, EMPTY_STR);

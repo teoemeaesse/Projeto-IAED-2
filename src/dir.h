@@ -12,7 +12,7 @@ typedef struct {
     NodeAVL * root;
 } TreeAVL;
 
-typedef struct directory{
+typedef struct directory {
     TreeAVL * subdirs;
     List * history;
     char * value;
@@ -36,7 +36,9 @@ Directory * createDirectory();
 FileSystem * createFileSystem();
 void destroyDirectory(Directory * dir);
 void destroyFileSystem(FileSystem * fs);
+void destroyPath(FileSystem * fs, List * components);
 int isEmpty(Directory * dir);
 void addDirectory(FileSystem * fs, char * path, char * value);
 void printDirectory(Directory * dir, List * path);
 Directory * findSubDirectory(Directory * dir, List * path);
+List * searchDirectory(Directory * tree, char * value);

@@ -9,3 +9,5 @@ void set(FileSystem * fs, Command * command);
 void print(FileSystem * fs);
 void find(FileSystem * fs, Command * command);
 void list(FileSystem * fs, Command * command);
+void search(FileSystem * fs, Command * command);
+void delete(FileSystem * fs, Command * command);

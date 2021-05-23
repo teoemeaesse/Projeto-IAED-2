@@ -107,3 +107,50 @@ void list(FileSystem * fs, Command * command) {
     free(path);
     destroyList(components);
 }
+
+
+void search(FileSystem * fs, Command * command) {
+    List * components;
+    char * value;
+
+    if(fs == NULL || command == NULL)
+        return;
+    
+    value = nextToken(command);
+
+    if(value == NULL)
+        return;
+    
+    components = searchDirectory(fs->root, value);
+
+    if(components == NULL) {
+        printf("%s\n", NOT_FOUND_ERR);
+        free(value);
+        return;
+    }
+
+    while(sizeList(components) > ZERO) {
+        printf("/%s", getFirst(components));
+        removeFirst(components);
+    }
+    putchar(NEW_LINE);
+
+    destroyList(components);
+    free(value);
+}
+
+void delete(FileSystem * fs, Command * command) {
+    List * components;
+    char * path;
+
+    if(fs == NULL || command == NULL)
+        return;
+    
+    path = nextToken(command);
+
+    components = pathToList(path);
+    destroyPath(fs, components);
+
+    destroyList(components);
+    free(path);
+}
