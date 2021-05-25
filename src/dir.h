@@ -1,23 +1,44 @@
+/*
+    file: dir.h
+    author: Tomas Marques ist199338
+    description: header file for all the directory / avl tree manipulation functions
+*/
+
 #include "list.h"
 
+/* forward declare directory for circular dependency */
 struct directory;
 
+/* 
+    represents a node in an avl tree 
+     - left and right branches;
+     - key (directory name)
+     - value (directory contents)
+*/
 typedef struct node_avl {
     struct node_avl * left, * right;
     char * key;
     struct directory * value;
 } NodeAVL;
 
+/* represents an avl tree, consisting of its root node */
 typedef struct {
     NodeAVL * root;
 } TreeAVL;
 
+/* 
+    represents a directory
+     - TreeAVL containing all its subdirectories
+     - Linked list of subdirectory names sorted by oldest to most recently added
+     - value (associated string)
+*/
 typedef struct directory {
     TreeAVL * subdirs;
     List * history;
     char * value;
 } Directory;
 
+/* represents a filesystem, containing the root directory */
 typedef struct {
     Directory * root;
 } FileSystem;

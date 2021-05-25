@@ -1,3 +1,9 @@
+/*
+    file: macros.h
+    author: Tomas Marques ist199338
+    description: header file for all helper macros and constants
+*/
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -5,6 +11,11 @@
 #define MALLOC_STR(S) malloc((strlen(S) + 1) * sizeof(char))
 #define SMALLOC(T) MALLOC(1, T)
 #define REALLOC(P, S, T) realloc(P, S * sizeof(T))
+
+#define IS_EQUAL_STR(S1, S2) strcmp(S1, S2) == 0
+#define PRINT_ERROR(E) printf("%s\n", E)
+#define PRINT_VALUE(V) printf("%s\n", V)
+#define PRINT_COMPONENT(C) printf("/%s", C)
 
 #define EMPTY_STR ""
 #define WHITESPACE ' '
@@ -31,4 +42,4 @@
 #define SEARCH_CMD "search"
 #define DELETE_CMD "delete"
 
-#define HELP_CMD_TXT "help: Imprime os comandos disponíveis.\nquit: Termina o programa.\nset: Adiciona ou modifica o valor a armazenar.\nprint: Imprime todos os caminhos e valores.\nfind: Imprime o valor armazenado.\nlist: Lista todos os componentes imediatos de um sub-caminho.\nsearch: Procura o caminho dado um valor.\ndelete: Apaga um caminho e todos os subcaminhos.\n"
+#define PRINT_HELP_CMD_TXT printf("%s\n", "help: Imprime os comandos disponíveis.\nquit: Termina o programa.\nset: Adiciona ou modifica o valor a armazenar.\nprint: Imprime todos os caminhos e valores.\nfind: Imprime o valor armazenado.\nlist: Lista todos os componentes imediatos de um sub-caminho.\nsearch: Procura o caminho dado um valor.\ndelete: Apaga um caminho e todos os subcaminhos.")

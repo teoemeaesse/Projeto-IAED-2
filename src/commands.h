@@ -1,6 +1,11 @@
+/*
+    file: commands.h
+    author: Tomas Marques ist199338
+    description: header file for all the commands the user can input
+*/
+
 #include "macros.h"
 #include "input.h"
-#include "stack.h"
 #include "dir.h"
 
 void help();
